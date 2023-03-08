@@ -7,11 +7,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,8 +22,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
 
 public class Settings extends AppCompatActivity {
     class CursorAdapter extends SimpleCursorAdapter {
@@ -75,12 +74,17 @@ public class Settings extends AppCompatActivity {
         }
     }
 
-    String[] currencies = {"USD", "EUR", "TRY", "KZT"};
+    String[] currencies = {"TRY", "KZT", "USD", "EUR"};
 
     Integer i;
     String[] from;
     int[] to;
     ListView listView;
+    
+    public static String specifiedCurrency = "TRY";
+
+    public static Double steamCommissions = 1.13;
+    public static Double additionalCommissions = 1.05;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,9 +122,9 @@ public class Settings extends AppCompatActivity {
             AdapterView.OnItemSelectedListener itemSelectedListener = new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
                     // Получаем выбранный объект
                     String item = (String) parent.getItemAtPosition(position);
+                    specifiedCurrency = item;
                     selection.setText(item);
                 }
 
@@ -131,12 +135,36 @@ public class Settings extends AppCompatActivity {
             spinner.setOnItemSelectedListener(itemSelectedListener);
         }
 
+        // Steam commission
+        {
+            EditText myTextBox = (EditText) findViewById(R.id.input_steam_commission);
+            myTextBox.addTextChangedListener(new TextWatcher() {
+
+                public void afterTextChanged(Editable s) {
+                    Log.d("MyLog", "Steam commission: " + s.toString());
+                    try {
+                        steamCommissions = 1 + Double.parseDouble((String) s.toString()) / 100;
+                    } catch (Exception ignored) {
+
+                    }
+                }
+
+                public void beforeTextChanged(CharSequence s, int start,
+                                              int count, int after) {
+                }
+
+                public void onTextChanged(CharSequence s, int start,
+                                          int before, int count) {
+                }
+            });
+        }
+
         // Работа с ListView комиссий
         {
             from = new String[]{"Name"};
             to = new int[]{R.id.inputPercent};
-            Button btnadd = findViewById(R.id.buttonAdd);
-            final EditText editadd = findViewById(R.id.input_percent);
+            Button buttonAdd = findViewById(R.id.buttonAdd);
+            final EditText getPercent = findViewById(R.id.input_percent);
 
             SQLiteDatabase db = openOrCreateDatabase("DBName", MODE_PRIVATE, null);
 
@@ -154,14 +182,14 @@ public class Settings extends AppCompatActivity {
 
             db.close();
 
-            btnadd.setOnClickListener(new View.OnClickListener() {
+            buttonAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (editadd.getText().toString().length() == 0) {
+                    if (getPercent.getText().toString().length() == 0) {
                         Toast.makeText(findViewById(R.id.listViewSettings).getContext(), "Empty field!", Toast.LENGTH_LONG).show();
                         return;
                     }
-                    if (editadd.getText().toString().length() >= 3) {
+                    if (Double.parseDouble(getPercent.getText().toString()) > 100) {
                         Toast.makeText(findViewById(R.id.listViewSettings).getContext(), "Too big value for commission!", Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -182,7 +210,7 @@ public class Settings extends AppCompatActivity {
                     }
 
 
-                    db.execSQL("INSERT INTO Commissions VALUES ('" + i + "','" + editadd.getText().toString() + "');");
+                    db.execSQL("INSERT INTO Commissions VALUES ('" + i + "','" + getPercent.getText().toString() + "');");
                     Cursor cursor = db.rawQuery("SELECT * FROM Commissions", null);
                     CursorAdapter scAdapter = new CursorAdapter(Settings.this, R.layout.list_item_settings, cursor, from, to);
 
@@ -191,7 +219,8 @@ public class Settings extends AppCompatActivity {
                     db.close();
 
                     Toast.makeText(findViewById(R.id.listViewSettings).getContext(), "a row added to the table", Toast.LENGTH_LONG).show();
-                    getAdditionalCommission();
+
+                    additionalCommissions = getAdditionalCommission();
                 }
             });
 
@@ -207,7 +236,7 @@ public class Settings extends AppCompatActivity {
         StringBuilder str = new StringBuilder();
         if (cursor.moveToFirst()) {
             do {
-                currentAdditionCommission *= 1 - Double.parseDouble(cursor.getString(1)) / 100.0;
+                currentAdditionCommission *= 1 + Double.parseDouble(cursor.getString(1)) / 100.0;
             } while (cursor.moveToNext());
         }
 

@@ -7,11 +7,10 @@
     android:background="@drawable/gradient_background"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"
-        android:orientation="vertical"
         tools:layout_editor_absoluteX="5dp"
         tools:layout_editor_absoluteY="5dp">
 
@@ -28,13 +27,19 @@
             android:id="@+id/RelativeLayout_mainLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="55dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textView_Title1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:text="Currency rate"
                 android:textAlignment="viewStart"
                 android:textColor="#FFFFFF"
@@ -128,9 +133,9 @@
                         android:orientation="horizontal">
 
                         <EditText
-                            android:id="@+id/input_phone"
+                            android:id="@+id/input_money_from"
                             android:layout_width="95dp"
-                            android:layout_height="wrap_content"
+                            android:layout_height="48dp"
                             android:layout_gravity="center"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
@@ -138,7 +143,7 @@
                             android:inputType="phone"
                             android:textAlignment="center"
                             android:textColor="#FFFFFF"
-                            android:textColorHint="#FFFFFF"
+                            android:textColorHint="#7CD1D1D1"
                             android:textSize="14sp" />
 
                         <TextView
@@ -162,7 +167,7 @@
                             android:textSize="20sp" />
 
                         <TextView
-                            android:id="@+id/textView_CurrencyValueRUB1"
+                            android:id="@+id/textview_money_from_RUB"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -204,7 +209,7 @@
                             android:textSize="14sp" />
 
                         <TextView
-                            android:id="@+id/textView_ResultCommission2"
+                            android:id="@+id/textview_money_to"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -236,7 +241,7 @@
                             android:textSize="20sp" />
 
                         <TextView
-                            android:id="@+id/textView_CurrencyValueRUB2"
+                            android:id="@+id/textview_money_to_RUB"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -263,92 +268,91 @@
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView_Title3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="Steam market calculator"
-                android:textAlignment="viewStart"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+<!--            <TextView-->
+<!--                android:id="@+id/textView_Title3"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="10dp"-->
+<!--                android:text="Steam market calculator"-->
+<!--                android:textAlignment="viewStart"-->
+<!--                android:textColor="#FFFFFF"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textStyle="bold" />-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/group_style_dark"
-                android:orientation="vertical">
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/button_add"
-
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="100dp"
-
-                        android:layout_height="40dp"
-
-                        android:background="@drawable/button_small"
-                        android:padding="0dp"
-                        android:text="add"
-                        android:textColor="#000000"
-                        android:textSize="14sp"
-                        app:backgroundTint="#FFFFFF" />
-
-                    <Button
-                        android:id="@+id/button_remove"
-
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="100dp"
-                        android:layout_height="40dp"
-
-                        android:layout_marginStart="10dp"
-
-                        android:background="@drawable/button_small"
-                        android:padding="0dp"
-                        android:text="remove"
-                        android:textColor="#000000"
-                        android:textSize="14sp"
-                        app:backgroundTint="#FFFFFF" />
-
-                </LinearLayout>
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="5dp"-->
+<!--                android:background="@drawable/group_style_dark"-->
+<!--                android:orientation="vertical">-->
 
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/group_style_lite"
-                    android:orientation="vertical">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_margin="10dp"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <Button-->
+<!--                        android:id="@+id/button_add"-->
+
+<!--                        style="?android:attr/buttonBarButtonStyle"-->
+<!--                        android:layout_width="100dp"-->
+
+<!--                        android:layout_height="48dp"-->
+
+<!--                        android:background="@drawable/button_small"-->
+<!--                        android:padding="0dp"-->
+<!--                        android:text="add"-->
+<!--                        android:textColor="#000000"-->
+<!--                        android:textSize="14sp"-->
+<!--                        app:backgroundTint="#FFFFFF" />-->
+
+<!--                    <Button-->
+<!--                        android:id="@+id/button_remove"-->
+
+<!--                        style="?android:attr/buttonBarButtonStyle"-->
+<!--                        android:layout_width="100dp"-->
+<!--                        android:layout_height="48dp"-->
+
+<!--                        android:layout_marginStart="10dp"-->
+
+<!--                        android:background="@drawable/button_small"-->
+<!--                        android:padding="0dp"-->
+<!--                        android:text="remove"-->
+<!--                        android:textColor="#000000"-->
+<!--                        android:textSize="14sp"-->
+<!--                        app:backgroundTint="#FFFFFF" />-->
+
+<!--                </LinearLayout>-->
 
 
-                    <ListView
-                        android:id="@+id/listViewMain"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_margin="10dp"-->
+<!--                    android:background="@drawable/group_style_lite"-->
+<!--                    android:orientation="vertical">-->
 
-                    </ListView>
 
-                </LinearLayout>
+<!--                    <ListView-->
+<!--                        android:id="@+id/listViewMain"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent">-->
 
-            </LinearLayout>
+<!--                    </ListView>-->
+
+<!--                </LinearLayout>-->
+
+<!--            </LinearLayout>-->
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_gravity="center|bottom"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center|bottom">
 
             <Button
                 android:id="@+id/button_settings"
@@ -356,7 +360,6 @@
 
                 android:layout_height="50dp"
                 android:layout_gravity="center_horizontal|bottom"
-                android:layout_marginBottom="5sp"
                 android:background="@drawable/button_settings"
 
                 android:text="Settings"
@@ -365,6 +368,7 @@
                 app:backgroundTint="#184354" />
 
         </LinearLayout>
-    </LinearLayout>
+
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
