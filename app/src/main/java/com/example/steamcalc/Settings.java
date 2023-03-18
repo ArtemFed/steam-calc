@@ -91,8 +91,6 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        listView = findViewById(R.id.listViewSettings);
-
         // Кнопка Навигации
         {
             Button button = findViewById(R.id.button_main_activity);
@@ -161,6 +159,8 @@ public class Settings extends AppCompatActivity {
 
         // Работа с ListView комиссий
         {
+            listView = findViewById(R.id.listViewSettings);
+
             from = new String[]{"Name"};
             to = new int[]{R.id.inputPercent};
             Button buttonAdd = findViewById(R.id.buttonAdd);
