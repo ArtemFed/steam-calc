@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -80,16 +81,26 @@ public class Settings extends AppCompatActivity {
     String[] from;
     int[] to;
     ListView listView;
-    
+
     public static String specifiedCurrency = "TRY";
 
     public static Double steamCommissions = 1.13;
     public static Double additionalCommissions = 1.05;
 
+    private EditText EditTextSteamCommission;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        // SharedPreferences Steam
+        {
+            EditTextSteamCommission = findViewById(R.id.input_steam_commission);
+            SharedPreferences save = getSharedPreferences("SAVE", 0);
+            EditTextSteamCommission.setText(save.getString("text", ""));
+        }
 
         // Кнопка Навигации
         {
@@ -98,6 +109,8 @@ public class Settings extends AppCompatActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    saveSteamEditText();
+
                     Intent intent = new Intent(Settings.this,
                             MainActivity.class);
                     startActivity(intent);
@@ -135,13 +148,12 @@ public class Settings extends AppCompatActivity {
 
         // Steam commission
         {
-            EditText myTextBox = (EditText) findViewById(R.id.input_steam_commission);
-            myTextBox.addTextChangedListener(new TextWatcher() {
+            EditTextSteamCommission.addTextChangedListener(new TextWatcher() {
 
                 public void afterTextChanged(Editable s) {
                     Log.d("MyLog", "Steam commission: " + s.toString());
                     try {
-                        steamCommissions = 1 + Double.parseDouble((String) s.toString()) / 100;
+                        steamCommissions = 1 + Double.parseDouble(s.toString()) / 100;
                     } catch (Exception ignored) {
 
                     }
@@ -225,6 +237,20 @@ public class Settings extends AppCompatActivity {
             });
 
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        saveSteamEditText();
+    }
+
+    private void saveSteamEditText() {
+        SharedPreferences save = getSharedPreferences("SAVE", 0);
+        SharedPreferences.Editor editor = save.edit(); //создаём редактор shared preferences
+        editor.putString("text", EditTextSteamCommission.getText().toString()); //сохраняем текст из edit1
+        editor.apply();
     }
 
     public double getAdditionalCommission() {

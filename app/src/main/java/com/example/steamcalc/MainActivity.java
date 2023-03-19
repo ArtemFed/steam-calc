@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -26,7 +28,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     class CursorAdapterMain extends SimpleCursorAdapter {
@@ -77,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
 
                     db.close();
                     Toast.makeText(_context, "row deleted from the db id=" + id, Toast.LENGTH_LONG).show();
+
+                    updateResult();
                 }
             });
         }
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isDataReady = false;
 
     private double currentRate = 1;
-    private double currentAllCommission = 1;
+    private double currentAllCommissions = 1;
 
     Integer i;
     ListView listView;
@@ -127,6 +130,53 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        // Кнопка показа Replenishment calculator
+        {
+            Button button = findViewById(R.id.button_show_repl_calc);
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LinearLayout ll = findViewById(R.id.layout_repl_calc);
+                    if (ll.getVisibility() == View.VISIBLE) {
+                        ll.setVisibility(View.GONE);
+                    } else {
+                        ll.setVisibility(View.VISIBLE);
+                    }
+
+                    if (button.getText().toString().equals("hide")) {
+                        button.setText("show");
+                    } else {
+                        button.setText("hide");
+                    }
+                }
+            });
+        }
+
+        // Кнопка показа Steam calculator
+        {
+            Button button = findViewById(R.id.button_show_steam_calc);
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LinearLayout ll = findViewById(R.id.layout_steam_calc);
+                    if (ll.getVisibility() == View.VISIBLE) {
+                        ll.setVisibility(View.GONE);
+                    } else {
+                        ll.setVisibility(View.VISIBLE);
+                    }
+
+
+                    if (button.getText().toString().equals("hide")) {
+                        button.setText("show");
+                    } else {
+                        button.setText("hide");
+                    }
+                }
+            });
+        }
+
         // Replenishment calculator
         {
             EditText myTextBox = (EditText) findViewById(R.id.input_money_from);
@@ -144,10 +194,10 @@ public class MainActivity extends AppCompatActivity {
                         TextView moneyTo = (TextView) findViewById(R.id.textview_money_to);
                         TextView moneyToRub = (TextView) findViewById(R.id.textview_money_to_RUB);
 
-                        currentAllCommission = Settings.steamCommissions * Settings.additionalCommissions;
+                        currentAllCommissions = Settings.steamCommissions * Settings.additionalCommissions;
 
-                        moneyTo.setText(String.valueOf(myRound(money * currentAllCommission, 2)));
-                        moneyToRub.setText(String.valueOf(myRound(moneyRate * currentAllCommission, 2)));
+                        moneyTo.setText(String.valueOf(myRound(money * currentAllCommissions, 2)));
+                        moneyToRub.setText(String.valueOf(myRound(moneyRate * currentAllCommissions, 2)));
 
                     } catch (Exception ignored) {
 
@@ -214,6 +264,14 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
 
+                    listView = findViewById(R.id.listViewMain);
+
+
+                    if (listView.getCount() >= 3) {
+                        Toast.makeText(findViewById(R.id.listViewMain).getContext(), "No more than three entries are available!", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
                     SQLiteDatabase db = openOrCreateDatabase("DBName", MODE_PRIVATE, null);
 
                     Cursor cursor2 = db.rawQuery("SELECT * FROM MarketItems", null);
@@ -236,13 +294,14 @@ public class MainActivity extends AppCompatActivity {
 
                     CursorAdapterMain scAdapter = new CursorAdapterMain(MainActivity.this, R.layout.list_item_main, cursor, from, to);
 
-                    listView = findViewById(R.id.listViewMain);
                     listView.setAdapter(scAdapter);
                     db.close();
 
                     Toast.makeText(findViewById(R.id.listViewMain).getContext(), "A row added to the table", Toast.LENGTH_LONG).show();
 
-//                    additionalCommissions = getAdditionalCommission();
+                    updateResult();
+
+
                 }
             });
 
@@ -258,34 +317,58 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateResult() {
-        if (listView.getCount() > 0) {
-            SQLiteDatabase db = openOrCreateDatabase("DBName", MODE_PRIVATE, null);
+        SQLiteDatabase db = openOrCreateDatabase("DBName", MODE_PRIVATE, null);
 
-            Cursor cursor = db.rawQuery("SELECT * FROM MarketItems", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM MarketItems", null);
 
-            Log.d("MyLog", "ColCount : " + cursor.getColumnCount());
-            Log.d("MyLog", "ColName0 : " + cursor.getColumnName(1));
-            Log.d("MyLog", "ColName1 : " + cursor.getColumnName(2));
+        double buySum = 0;
+        double sellSum = 0;
+        cursor.moveToFirst();
 
-            double buySum = 0;
-            double sellSum = 0;
-            cursor.moveToFirst();
-
-            while (!cursor.isAfterLast()) {
-                buySum += cursor.getDouble(1);
-                sellSum += cursor.getDouble(2);
-                cursor.moveToNext();
-            }
-
-            Log.d("MyLog", "Element : " + buySum);
-            Log.d("MyLog", "Element : " + sellSum);
-
-            TextView textViewResTRY = findViewById(R.id.textView_ResultTRY);
-            TextView textViewResRUB = findViewById(R.id.textView_ResultRUB);
-
-            db.close();
-            cursor.close();
+        while (!cursor.isAfterLast()) {
+            buySum += cursor.getDouble(1);
+            sellSum += cursor.getDouble(2);
+            cursor.moveToNext();
         }
+
+        TextView textViewDiffTRY = findViewById(R.id.textView_DiffTRY);
+        TextView textViewDiffRUB = findViewById(R.id.textView_DiffRUB);
+
+        TextView textViewTotBuyTRY = findViewById(R.id.textView_TotalBuyTRY);
+        TextView textViewTotBuyRUB = findViewById(R.id.textView_TotalBuyRUB);
+
+        TextView textViewTotSellTRY = findViewById(R.id.textView_TotalSellTRY);
+        TextView textViewTotSellRUB = findViewById(R.id.textView_TotalSellRUB);
+
+        textViewTotBuyTRY.setText(String.valueOf(buySum));
+        textViewTotBuyRUB.setText(String.valueOf(myRound(buySum * currentRate, 1)));
+
+        double totalGain = myRound(sellSum / Settings.steamCommissions / Settings.additionalCommissions, 1);
+        textViewTotSellTRY.setText(String.valueOf(totalGain));
+        textViewTotSellRUB.setText(String.valueOf(myRound(totalGain * currentRate, 1)));
+
+        double diff = myRound(totalGain - buySum, 1);
+        textViewDiffTRY.setText(String.valueOf(diff));
+        textViewDiffRUB.setText(String.valueOf(myRound(diff * currentRate, 1)));
+
+        Resources resources = getResources();
+
+        if (diff >= -1 && diff <= 1) {
+            int white = resources.getColor(R.color.white, null);
+            textViewDiffTRY.setTextColor(white);
+            textViewDiffRUB.setTextColor(white);
+        } else if (diff < -1) {
+            int red = resources.getColor(R.color.red, null);
+            textViewDiffTRY.setTextColor(red);
+            textViewDiffRUB.setTextColor(red);
+        } else {
+            int green = resources.getColor(R.color.green, null);
+            textViewDiffTRY.setTextColor(green);
+            textViewDiffRUB.setTextColor(green);
+        }
+
+        db.close();
+        cursor.close();
     }
 
     public static double myRound(double value, int places) {
@@ -300,14 +383,18 @@ public class MainActivity extends AppCompatActivity {
         TextView textViewName4 = findViewById(R.id.textView_CurrencyInfoTRY3);
         TextView textViewName5 = findViewById(R.id.textView_CurrencyInfoTRY4);
         TextView textViewName6 = findViewById(R.id.textView_CurrencyInfoTRY5);
-        TextView textViewName7 = findViewById(R.id.textView_CurrencyInfoTRY6);
+//        TextView textViewName7 = findViewById(R.id.textView_CurrencyInfoTRY);
+        TextView textViewName8 = findViewById(R.id.textView_CurrencyInfoTRY7);
+        TextView textViewName9 = findViewById(R.id.textView_CurrencyInfoTRY8);
         textViewName1.setText(code);
         textViewName2.setText(code);
         textViewName3.setText(code);
         textViewName4.setText(code);
         textViewName5.setText(code);
         textViewName6.setText(code);
-        textViewName7.setText(code);
+//        textViewName7.setText(code);
+        textViewName8.setText(code);
+        textViewName9.setText(code);
 
         TextView textViewRate = findViewById(R.id.textView_ConvertedResult);
 
@@ -353,9 +440,6 @@ public class MainActivity extends AppCompatActivity {
 
             data = table.children();
 
-//            for (Object item : table.toArray()) {
-//                Log.d("MyLog", "Element : " + item);
-//            }
             isDataReady = true;
             Log.d("MyLog", "Website scraping is done after: " + (double) (System.currentTimeMillis() - time));
         } catch (IOException e) {
