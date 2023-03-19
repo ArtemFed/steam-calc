@@ -1,5 +1,7 @@
 package com.example.steamcalc;
 
+import static java.lang.Thread.sleep;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -116,6 +118,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initThread();
+
         // Кнопка перехода в настройки
         {
             Button button = findViewById(R.id.button_settings);
@@ -214,8 +218,6 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        initThread();
-
         // listView
         {
             listView = findViewById(R.id.listViewMain);
@@ -310,10 +312,17 @@ public class MainActivity extends AppCompatActivity {
         while (!isDataReady) {
 //            Log.d("MyLog", "Waiting for website data");
         }
+        isDataReady = false;
 
         setCurrencyInfo(Settings.specifiedCurrency);
 
         updateResult();
+
+//        try {
+//            sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void updateResult() {
